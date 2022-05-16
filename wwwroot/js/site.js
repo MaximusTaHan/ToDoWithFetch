@@ -15,21 +15,31 @@ function addItem() {
         isComplete: false,
         name: addNameTextbox.value.trim()
     };
-
-    fetch(uri, {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(item)
-    })
-        .then(response => response.json())
-        .then(() => {
-            getItems();
-            addNameTextbox.value = '';
+    if (todos.some(x => x.name == item.name)) {
+        inputError("An Item with that Name already Exists");
+    }
+    else {
+        fetch(uri, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item)
         })
-        .catch(error => console.error('Unable to add item.', error));
+            .then(response => response.json())
+            .then(() => {
+                getItems();
+                inputError("");
+                addNameTextbox.value = '';
+            })
+            .catch(error => console.error('Unable to add item.', error));
+    }
+}
+
+function inputError(message) {
+    let text = message;
+    document.getElementById("error").innerHTML = text;
 }
 
 function deleteItem(id) {
@@ -42,6 +52,9 @@ function deleteItem(id) {
 
 function displayEditForm(id) {
     const item = todos.find(item => item.id === id);
+
+    document.getElementById('postForm').style.display = 'none';
+    inputError("");
 
     document.getElementById('edit-name').value = item.name;
     document.getElementById('edit-id').value = item.id;
@@ -65,7 +78,10 @@ function updateItem() {
         },
         body: JSON.stringify(item)
     })
-        .then(() => getItems())
+        .then(() => {
+            getItems();
+            inputError("");
+        })
         .catch(error => console.error('Unable to update item.', error));
 
     closeInput();
@@ -75,6 +91,7 @@ function updateItem() {
 
 function closeInput() {
     document.getElementById('editForm').style.display = 'none';
+    document.getElementById('postForm').style.display = 'block';
 }
 
 function _displayCount(itemCount) {
