@@ -79,10 +79,6 @@ namespace ToDoWithFetch.Controllers
         [HttpPost]
         public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO todoItemDTO)
         {
-            if (_context.TodoItems.Any(item => item.Name == todoItemDTO.Name))
-            {
-                return NotFound();
-            }
 
             var todoItem = new TodoItem
             {
