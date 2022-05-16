@@ -15,9 +15,11 @@ function addItem() {
         isComplete: false,
         name: addNameTextbox.value.trim()
     };
+
     if (todos.some(x => x.name == item.name)) {
         inputError("An Item with that Name already Exists");
     }
+
     else {
         fetch(uri, {
             method: 'POST',
@@ -69,22 +71,26 @@ function updateItem() {
         isComplete: document.getElementById('edit-isComplete').checked,
         name: document.getElementById('edit-name').value.trim()
     };
-
-    fetch(`${uri}/${itemId}`, {
-        method: 'PUT',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(item)
-    })
-        .then(() => {
-            getItems();
-            inputError("");
+    if (todos.some(x => x.name == item.name && x.id != item.id)) {
+        inputError("An Item with that Name already Exists");
+    }
+    else {
+        fetch(`${uri}/${itemId}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item)
         })
-        .catch(error => console.error('Unable to update item.', error));
+            .then(() => {
+                getItems();
+                inputError("");
+            })
+            .catch(error => console.error('Unable to update item.', error));
 
-    closeInput();
+        closeInput();
+    }
 
     return false;
 }
